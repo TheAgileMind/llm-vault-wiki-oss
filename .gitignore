@@ -1,0 +1,11 @@
+.llm-vault-wiki/
+.gbrain-study/
+.tmp/
+.pytest_cache/
+.venv/
+__pycache__/
+*.pyc
+dist/
+build/
+*.egg-info/
+llm-vault-wiki.yaml
