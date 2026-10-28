@@ -1,0 +1,107 @@
+# Example configuration. Copy to llm-vault-wiki.yaml and point vault_root at
+# your own Obsidian vault. llm-vault-wiki.yaml is gitignored.
+vault_root: "./example-vault"
+state_dir: ".llm-vault-wiki"
+
+apply_policy:
+  mode: dry_run_required
+  require_second_command: true
+  direct_edit_allowed_risk_bands: [low]
+  high_risk_requires_review: true
+
+search_policy:
+  generic_anchor_terms: [ai, system, systems, intent]
+  phrase_terms:
+    - context pack
+    - tool execution
+
+search_evaluations:
+  agent_systems:
+    query: "AI agents coding agents agent workflows guardrails evals autonomy tool execution context packs"
+    relevance_patterns:
+      - 'agents=AI agents?|agent systems?|coding agents?|autonomous agents?|multi[- ]agent'
+      - 'guardrails=guardrails?|evals?\b|tool execution|context packs?|autonomy'
+    limit: 10000
+    precision_points: [25, 100]
+    min_precision_at:
+      25: 0.8
+  source_workflow_docs:
+    query: "llm-vault-wiki process-source file-back draft-apply-plan apply-plan skeleton quality_validation"
+    relevance_patterns:
+      - 'workflow_docs=process-source|draft-apply-plan|file-back\.brief|apply-plan\.skeleton|quality_validation|LLM Vault Wiki'
+    limit: 10000
+    precision_points: [5, 10, 25, 100]
+    min_precision_at:
+      5: 0.8
+  canonical_file_back_notes:
+    query: "file-back source_capture direct source claims agent interpretation recommended action canonical note"
+    relevance_patterns:
+      - 'file_back_frontmatter=tags:\s*\[[^\]]*file-back|^\s*-\s*file-back\s*$'
+      - 'canonical_sections=source_capture:|## Direct Source Claims|## Agent Interpretation|## Recommended Action'
+    limit: 10000
+    precision_points: [5, 10, 25, 100]
+    min_precision_at:
+      10: 0.8
+
+exclude:
+  - "05_Journal/Personal/**"
+  - "**/.env"
+  - "**/.env.*"
+  - "**/node_modules/**"
+  - "**/.git/**"
+  - "**/__pycache__/**"
+  - "**/.venv/**"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/*.key"
+  - "**/*secret*"
+
+folders:
+  "00_Inbox":
+    role: intake
+    include: true
+    risk: low
+    allowed_ops: [read, classify, create_file, move_file, archive_file]
+    review_required_for: [canonical_synthesis]
+  "01_Projects":
+    role: project_memory
+    include: true
+    risk: medium
+    allowed_ops: [read, index, create_file, report]
+    review_required_for: [create_file, meaning_change, decision_log_update]
+  "02_Domains":
+    role: domain_synthesis
+    include: true
+    risk: medium
+    allowed_ops: [read, index, create_file, report]
+    review_required_for: [create_file, new_synthesis, meaning_change]
+  "03_Research":
+    role: research_artifacts
+    include: true
+    risk: medium
+    allowed_ops: [read, index, create_file, report]
+    review_required_for: [create_file, new_brief, claim_change]
+  "04_Content":
+    role: content_engine
+    include: true
+    risk: medium
+    allowed_ops: [read, index, create_file, report]
+    review_required_for: [create_file, draft_edit, publish_status_change]
+  "05_Journal":
+    role: selective_source
+    include: partial
+    risk: high
+    allowed_ops: [read, index]
+    review_required_for: [all_writes]
+  "06_Proof_Points":
+    role: evidence_ledger
+    include: true
+    risk: high
+    allowed_ops: [read, index, report]
+    review_required_for: [all_writes]
+  "08_Archive/LLM_Vault_Wiki":
+    role: controlled_archive
+    include: true
+    risk: low
+    allowed_ops: [read, index, archive_file, create_file, report]
+    review_required_for: []
